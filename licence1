@@ -1,0 +1,61 @@
+#include<stdio.h>
+#include<stdlib.h> 
+#define MAXN 20
+int flag = 1;
+typedef struct TreeNode* BinTree;
+struct TreeNode
+{
+	char Data;
+	BinTree Left;
+	BinTree Right;
+};
+BinTree CreateBinTree(char* Pre, char* In, int Len)
+{ /* 根据先序遍历序列和中序遍历序列构造二叉树 */
+	BinTree T;
+	int i;
+
+	if (!Len) return NULL; /* 递归终止 */
+	T = (BinTree)malloc(sizeof(struct TreeNode));
+	T->Data = Pre[0]; //根节点为先序遍历序列的第一个结点
+	for (i = 0; i < Len; i++) /* 在中序里找根结点 */
+		if (Pre[0] == In[i]) break;
+	if (i == Len)
+	{
+		flag = 0;
+		return NULL;
+	}
+	else { /* 递归生成左右子树 */
+		T->Left = CreateBinTree(Pre + 1, In, i);
+		T->Right = CreateBinTree(Pre + 1 + i, In + i + 1, Len - i - 1);
+		return T;
+	}
+}
+int Height(BinTree T)
+{ /* 求树的高度 */
+	int THeight, LHeight, RHeight;
+
+	if (!T) /* 递归终止条件 */
+		THeight = 0;
+	else { /* 后序遍历 */
+		LHeight = Height(T->Left);//求左子树的高度
+		RHeight = Height(T->Right);//求右子树的高度
+		THeight = LHeight > RHeight ? LHeight : RHeight;//取左右子树较大的高度
+		THeight = THeight + 1; /* 树高为左右树高较大者加1 */
+	}
+	return THeight;
+}
+int main()
+{
+	int N;
+	char Pre[MAXN + 1], In[MAXN + 1];
+	BinTree T = NULL;
+
+	scanf_s("%d", &N);
+	scanf_s("%s\n%s", Pre, In);
+	T = CreateBinTree(Pre, In, N);
+	if (flag == 1)
+		printf("%d\n", Height(T));
+	else
+		printf("no BinTree!");
+	return 0;
+}
